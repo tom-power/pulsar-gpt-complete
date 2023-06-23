@@ -1,0 +1,12 @@
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Selection To Code'
+      'submenu': [
+        {'label': 'On', 'command': 'pulsar-gpt-complete:on'},
+        {'label': 'Off', 'command': 'pulsar-gpt-complete:off'}
+      ]
+    ]
+  }
+]
