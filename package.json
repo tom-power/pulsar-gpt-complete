@@ -1,0 +1,25 @@
+{
+  "name": "pulsar-gpt-complete",
+  "main": "./lib/main",
+  "version": "0.1.0",
+  "description": "Call OpenAI completions in Pulsar",
+  "repository": "https://github.com/tom-power/pulsar-gpt-complete",
+  "license": "MIT",
+  "engines": {
+    "pulsar": ">=1.0.0 <2.0.0"
+  },
+  "configSchema": {
+    "openaiApiKey": {
+      "type": "string",
+      "default": "",
+      "description": "Your openai api key."
+    }
+  },
+  "dependencies": {
+    "openai": "^3.3.0",
+    "dedent-js": "^1.0.1"
+  },
+  "scripts": {
+    "test": "pulsar --test spec"
+  }
+}
