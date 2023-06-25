@@ -44,7 +44,7 @@ describe("pulsar gpt complete", () => {
 
         expect(editor.getText()).toBe(expectedPrompt + "\n");
 
-        selectionToCode = atom.commands.dispatch(editorView, "pulsar-gpt-complete:selection-to-code")
+        selectionToCode = atom.commands.dispatch(editorView, "pulsar-gpt-complete:code-from-selection")
 
         selectionToCode.then(() =>
           expect(editor.getText()).toBe(expectedPrompt + "\n" + expectedCode + "\n")
