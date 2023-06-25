@@ -51,7 +51,7 @@ describe("pulsar gpt complete", () => {
       editor.setText(testComment);
       editor.selectAll();
       await atom.commands.dispatch(editorView, "pulsar-gpt-complete:code-from-selection");
-      expect(pulsarGptComplete.gptComplete.completionFor).toHaveBeenCalledWith(testComment, code);
+      expect(pulsarGptComplete.gptComplete.completionFor).toHaveBeenCalledWith(testComment, code, "JavaScript");
       expect(editor.getText()).toBe(testComment + "\n" + testCode);
     });
 
@@ -61,7 +61,7 @@ describe("pulsar gpt complete", () => {
       editor.selectAll();
 
       await atom.commands.dispatch(editorView, "pulsar-gpt-complete:comment-from-selection");
-      expect(pulsarGptComplete.gptComplete.completionFor).toHaveBeenCalledWith(testCode, comment);
+      expect(pulsarGptComplete.gptComplete.completionFor).toHaveBeenCalledWith(testCode, comment, "plain text");
       expect(editor.getText()).toBe(testComment + "\n" + testCode);
     });
   });

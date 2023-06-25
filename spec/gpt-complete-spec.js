@@ -14,12 +14,13 @@ describe("gpt complete", () => {
       expecting: "testExpecting"
     }
 
-    gptComplete.completionFor("testRequest", testRole);
+    gptComplete.completionFor("testRequest", testRole, "testGrammar");
 
     function expectedContent() {
       return `###
               Role name: testName
-              testDescription
+              testDescription 
+              Output should be in testGrammar.
 
               Request: testRequest
               ###
