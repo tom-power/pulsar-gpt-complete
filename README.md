@@ -8,4 +8,5 @@ Roles/prompts borrowed from [ShellGpt](https://github.com/TheR1D/shell_gpt) usin
 
 | Command                                   | Description                                                   |
 | ----------------------------------------- | ------------------------------------------------------------- |
-| `pulsar-gpt-complete:code from selection` | provide code completion for selected text below selected text |
+| `pulsar-gpt-complete:code from selection` | provide code from selected text below selected text |
+| `pulsar-gpt-complete:comment from selection` | provide comment from selected text above selected text |
