@@ -1,6 +1,6 @@
-const {
-  getPulsarGptComplete
-} = require('../lib/lib/pulsar-gpt-complete');
+const { getPulsarGptComplete } = require('../lib/lib/pulsar-gpt-complete');
+const code  = require('../lib/lib/roles/code');
+const comment = require('../lib/lib/roles/comment');
 
 const pulsarGptComplete = getPulsarGptComplete()
 
@@ -18,38 +18,51 @@ describe("pulsar gpt complete", () => {
     let editorView = null;
 
     beforeEach(() => {
-      waitsForPromise(() => atom.workspace.open('test.txt'));
+      waitsForPromise(() => atom.workspace.open('test.js'));
+      waitsForPromise(() => atom.packages.activatePackage('language-javascript'));
       waitsForPromise(() => atom.packages.activatePackage('pulsar-gpt-complete'));
 
       return runs(() => {
         editor = atom.workspace.getActiveTextEditor();
         editorView = atom.views.getView(editor);
+        editor.selectAll();
+        editor.delete();
       });
     });
 
-    describe("selection to code", () => {
-      it("should generate code from selection", () => {
-        expectedPrompt = "// a commented prompt"
-        expectedCode = "let generated=code"
-        expectedCodeData = {
-          data: {
-            choices: [{
-              message: {
-                content: expectedCode
-              }
-            }]
-          }
-        };
-        spyOn(pulsarGptComplete, 'selectionToCodeCompletion').andReturn(Promise.resolve(expectedCodeData));
+    const testCommentCompletion = "a comment"
+    const testComment = `// ${testCommentCompletion}`
+    const testCode = "const some=code"
 
-        expect(editor.getText()).toBe(expectedPrompt + "\n");
+    function completionFor(content) {
+      return {
+        data: {
+          choices: [{
+            message: {
+              content: content
+            }
+          }]
+        }
+      }
+    };
 
-        selectionToCode = atom.commands.dispatch(editorView, "pulsar-gpt-complete:code-from-selection")
+    it("should generate code from selection", async () => {
+      spyOn(pulsarGptComplete.gptComplete, 'completionFor').andReturn(Promise.resolve(completionFor(testCode)));;
+      editor.setText(testComment);
+      editor.selectAll();
+      await atom.commands.dispatch(editorView, "pulsar-gpt-complete:code-from-selection");
+      expect(pulsarGptComplete.gptComplete.completionFor).toHaveBeenCalledWith(testComment, code);
+      expect(editor.getText()).toBe(testComment + "\n" + testCode);
+    });
 
-        selectionToCode.then(() =>
-          expect(editor.getText()).toBe(expectedPrompt + "\n" + expectedCode + "\n")
-        );
-      });
+    it("should generate comment from selection", async () => {
+      spyOn(pulsarGptComplete.gptComplete, 'completionFor').andReturn(Promise.resolve(completionFor(testCommentCompletion)));;
+      editor.setText(testCode);
+      editor.selectAll();
+
+      await atom.commands.dispatch(editorView, "pulsar-gpt-complete:comment-from-selection");
+      expect(pulsarGptComplete.gptComplete.completionFor).toHaveBeenCalledWith(testCode, comment);
+      expect(editor.getText()).toBe(testComment + "\n" + testCode);
     });
   });
 });
