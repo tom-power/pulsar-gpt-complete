@@ -92,9 +92,9 @@ function assertRequest(actualRequest, expectedRequest) {
 
   expect(actualMessage.role).toEqual(expectedMessage.role)
 
-  String.prototype.normalize = function() {
+  String.prototype.normalize = function () {
     return this.replace(/\n+/g, '').replace(/\s\s+/g, '')
   }
-  
+
   expect(actualMessage.content.normalize()).toEqual(expectedMessage.content.normalize())
 }
