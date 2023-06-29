@@ -1,7 +1,11 @@
 const GptComplete = require('../lib/lib/gpt-complete');
 const dedent = require('dedent-js');
 
-const gptComplete = new GptComplete("testKey");
+function configWith(outputLanguageFromGrammar = true) {
+  return { "apiKey": "testKey", "outputLanguageFromGrammar": outputLanguageFromGrammar }
+};
+
+const gptCompleteWith = (config = configWith()) => new GptComplete(config);
 
 const testRole = {
   name: "testName",
@@ -9,54 +13,88 @@ const testRole = {
   expecting: "testExpecting"
 }
 
-function expectedContent(outputRequest) {
+function expectedContent(outputLanguage) {
   return `###
           Role name: testName
-          testDescription${outputRequest}
+          testDescription${outputLanguage}
 
           Request: testRequest
           ###
           testExpecting:`
 }
 
-function expectedRequest(outputRequest) {
+function expectedRequest(outputLanguage) {
   return {
     model: "gpt-3.5-turbo",
     messages: [{
       role: "user",
-      content: dedent(expectedContent(outputRequest))
+      content: dedent(expectedContent(outputLanguage))
     }]
   }
 }
 
 describe("gpt complete", () => {
   it("should pass correct request to openai", () => {
+    const gptComplete = gptCompleteWith()
+
     spyOn(gptComplete.openai, 'createChatCompletion')
 
     gptComplete.completionFor("testRequest", testRole, "testGrammar");
 
     actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
 
-    expect(actualRequest).toEqual(expectedRequest("\nOutput should be in testGrammar"))
+    assertRequest(actualRequest, expectedRequest("\nOutput should be in testGrammar"))
   });
 
   it("shouldn't request an output language when there's a null grammar", () => {
+    const gptComplete = gptCompleteWith()
+
     spyOn(gptComplete.openai, 'createChatCompletion')
 
     gptComplete.completionFor("testRequest", testRole, "text.plain.null-grammar");
 
     actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
 
-    expect(actualRequest).toEqual(expectedRequest(""))
+    assertRequest(actualRequest, expectedRequest(""))
   });
 
   it("shouldn't request an output language when there's no grammar", () => {
+    const gptComplete = gptCompleteWith()
+
     spyOn(gptComplete.openai, 'createChatCompletion')
 
     gptComplete.completionFor("testRequest", testRole, "");
 
     actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
 
-    expect(actualRequest).toEqual(expectedRequest(""))
+    assertRequest(actualRequest, expectedRequest(""))
+  });
+
+  it("shouldn't request an output language when outputLanguageFromGrammar is false", () => {
+    const gptComplete = gptCompleteWith(false)
+
+    spyOn(gptComplete.openai, 'createChatCompletion')
+
+    gptComplete.completionFor("testRequest", testRole, "testGrammar");
+
+    actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
+
+    assertRequest(actualRequest, expectedRequest(""))
   });
 });
+
+
+function assertRequest(actualRequest, expectedRequest) {
+  expect(actualRequest.model).toEqual(expectedRequest.model)
+
+  expectedMessage = expectedRequest.messages[0]
+  actualMessage = actualRequest.messages[0]
+
+  expect(actualMessage.role).toEqual(expectedMessage.role)
+
+  String.prototype.normalize = function() {
+    return this.replace(/\n+/g, '').replace(/\s\s+/g, '')
+  }
+  
+  expect(actualMessage.content.normalize()).toEqual(expectedMessage.content.normalize())
+}
