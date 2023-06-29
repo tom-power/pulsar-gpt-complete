@@ -3,7 +3,7 @@ const dedent = require('dedent-js');
 
 function configWith(outputLanguageFromGrammar = true) {
   return { "apiKey": "testKey", "outputLanguageFromGrammar": outputLanguageFromGrammar }
-};
+}
 
 const gptCompleteWith = (config = configWith()) => new GptComplete(config);
 
@@ -41,7 +41,7 @@ describe("gpt complete", () => {
 
     gptComplete.completionFor("testRequest", testRole, "testGrammar");
 
-    actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
+    const actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
 
     assertRequest(actualRequest, expectedRequest("\nOutput should be in testGrammar"))
   });
@@ -53,7 +53,7 @@ describe("gpt complete", () => {
 
     gptComplete.completionFor("testRequest", testRole, "text.plain.null-grammar");
 
-    actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
+    const actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
 
     assertRequest(actualRequest, expectedRequest(""))
   });
@@ -65,7 +65,7 @@ describe("gpt complete", () => {
 
     gptComplete.completionFor("testRequest", testRole, "");
 
-    actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
+    const actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
 
     assertRequest(actualRequest, expectedRequest(""))
   });
@@ -77,7 +77,7 @@ describe("gpt complete", () => {
 
     gptComplete.completionFor("testRequest", testRole, "testGrammar");
 
-    actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
+    const actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
 
     assertRequest(actualRequest, expectedRequest(""))
   });
@@ -87,8 +87,8 @@ describe("gpt complete", () => {
 function assertRequest(actualRequest, expectedRequest) {
   expect(actualRequest.model).toEqual(expectedRequest.model)
 
-  expectedMessage = expectedRequest.messages[0]
-  actualMessage = actualRequest.messages[0]
+  const expectedMessage = expectedRequest.messages[0]
+  const actualMessage = actualRequest.messages[0]
 
   expect(actualMessage.role).toEqual(expectedMessage.role)
 
