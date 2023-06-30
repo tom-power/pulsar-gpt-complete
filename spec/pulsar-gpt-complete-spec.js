@@ -1,5 +1,6 @@
 const { getPulsarGptComplete } = require('../lib/lib/pulsar-gpt-complete');
 const code = require('../lib/lib/role/code');
+const codeFromFile = require('../lib/lib/role/codeFromFile');
 const comment = require('../lib/lib/role/comment');
 
 const pulsarGptComplete = getPulsarGptComplete()
@@ -32,7 +33,9 @@ describe("pulsar gpt complete", () => {
 
     const testCommentCompletion = "a comment"
     const testComment = `// ${testCommentCompletion}`
-    const testCode = "const some=code"
+    const testCode = "const some='code'"
+    const testCodeNext = "console.log(some)"
+    const testCodeEnd = "console.log('end')"
 
     function completionFor(content) {
       return {
@@ -52,7 +55,17 @@ describe("pulsar gpt complete", () => {
       editor.selectAll();
       await atom.commands.dispatch(editorView, "pulsar-gpt-complete:code-from-selection");
       expect(pulsarGptComplete.gptComplete.completionFor).toHaveBeenCalledWith(testComment, code, "JavaScript");
-      expect(editor.getText()).toBe(testComment + "\n" + testCode);
+      expect(editor.getText()).toBe(`${testComment}\n${testCode}`);
+    });
+
+    it("should generate next code from file", async () => {
+      spyOn(pulsarGptComplete.gptComplete, 'completionFor').andReturn(Promise.resolve(completionFor(`${testCodeNext}`)));
+      const testText = `${testComment}\n${testCode}\n\n${testCodeEnd}`
+      editor.insertText(testText);
+      editor.moveUp(1);
+      await atom.commands.dispatch(editorView, "pulsar-gpt-complete:code-from-file");
+      expect(pulsarGptComplete.gptComplete.completionFor).toHaveBeenCalledWith(testText, codeFromFile, "JavaScript", 3);
+      expect(editor.getText()).toBe(`${testComment}\n${testCode}\n${testCodeNext}\n${testCodeEnd}`);
     });
 
     it("should generate comment from selection", async () => {
@@ -62,7 +75,7 @@ describe("pulsar gpt complete", () => {
 
       await atom.commands.dispatch(editorView, "pulsar-gpt-complete:comment-from-selection");
       expect(pulsarGptComplete.gptComplete.completionFor).toHaveBeenCalledWith(testCode, comment, "plain text");
-      expect(editor.getText()).toBe(testComment + "\n" + testCode);
+      expect(editor.getText()).toBe(`${testComment}\n${testCode}`);
     });
   });
 });
