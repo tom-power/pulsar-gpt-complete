@@ -1,6 +1,6 @@
 const { getPulsarGptComplete } = require('../lib/lib/pulsar-gpt-complete');
-const code = require('../lib/lib/roles/code');
-const comment = require('../lib/lib/roles/comment');
+const code = require('../lib/lib/role/code');
+const comment = require('../lib/lib/role/comment');
 
 const pulsarGptComplete = getPulsarGptComplete()
 
