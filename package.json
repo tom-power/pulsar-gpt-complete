@@ -28,8 +28,8 @@
     "eslint": "eslint . --ext .json,.js",
     "lint": "npm run eslint",
     "lintfix": "npm run eslint -- --fix",
-    "editor-test": "pulsar --test spec",
-    "test": "npm run editor-test && npm run lint"
+    "test-editor": "pulsar --test spec",
+    "test": "npm run test-editor && npm run lint"
   },
   "devDependencies": {
     "eslint": "^8.43.0",

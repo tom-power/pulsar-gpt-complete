@@ -14,11 +14,12 @@ const testRole = {
   expecting: expectingCode
 }
 
-function expectedRequest(outputLanguage, role = testRole) {
+function expectedRequest(outputLanguage, role = testRole, lineNumber = null) {
+  const description = lineNumber ? role.description(lineNumber) : role.description
   function content() {
     return `###
           Role name: ${role.name}
-          ${role.description}
+          ${description}
 
           Request: testRequest
           ###
@@ -94,6 +95,30 @@ describe("gpt complete", () => {
       assertRequest(actualRequest, expectedRequest("", testTextRole))
     });
   });  
+
+
+
+  describe("code from file requests", () => {
+    it("should request with a line number", () => {
+      const gptComplete = gptCompleteWith()
+  
+      spyOn(gptComplete.openai, 'createChatCompletion')
+  
+      const testTextRole = {
+        name: "testName",
+        description: (lineNumber) => "testDescription " + lineNumber,
+        expecting: expectingText
+      }
+  
+      gptComplete.completionFor("testRequest", testTextRole, "testGrammar", 1);
+  
+      const actualRequest = gptComplete.openai.createChatCompletion.calls[0].args[0]
+  
+      assertRequest(actualRequest, expectedRequest("", testTextRole, 1))
+    });
+    
+
+  });
 });
 
 function assertRequest(actualRequest, expectedRequest) {
